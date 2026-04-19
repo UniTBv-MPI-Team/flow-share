@@ -19,6 +19,12 @@ app.use(express.static(path.join(__dirname, "..", "view")));
 
 // Routes will be added here as features are implemented
 
+import authRoutes from "./routes/auth-routes";
+import userRoutes from "./routes/user-routes";
+
+app.use("/auth", authRoutes);
+app.use("/api/user", userRoutes);
+
 app.use((req, res) => {
     res.status(404).send("<h1>404 - Not Found</h1>");
 });
