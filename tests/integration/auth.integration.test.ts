@@ -1,0 +1,50 @@
+import request from 'supertest';
+import app from '../../src/server';
+
+describe('Auth Integration', () => {
+    const validUser = {
+        username: 'testuser_auth',
+        emailAddress: 'auth@test.com',
+        password: 'Password123!'
+    };
+
+    it('registers a new user successfully', async () => {
+        const res = await request(app)
+            .post('/auth/register')
+            .send(validUser);
+        expect(res.status).toBe(201);
+    });
+
+    it('rejects duplicate username', async () => {
+        const res = await request(app)
+            .post('/auth/register')
+            .send(validUser);
+        expect(res.status).toBe(409);
+    });
+
+    it('rejects missing fields on register', async () => {
+        const res = await request(app)
+            .post('/auth/register')
+            .send({ username: 'onlyusername' });
+        expect(res.status).toBe(400);
+    });
+
+    it('logs in with valid credentials', async () => {
+        const res = await request(app)
+            .post('/auth/login')
+            .send({ username: validUser.username, password: validUser.password });
+        expect(res.status).toBe(200);
+    });
+
+    it('rejects wrong password', async () => {
+        const res = await request(app)
+            .post('/auth/login')
+            .send({ username: validUser.username, password: 'wrongpass' });
+        expect(res.status).toBe(401);
+    });
+
+    it('blocks protected route without token', async () => {
+        const res = await request(app).get('/api/group');
+        expect(res.status).toBe(401);
+    });
+});
