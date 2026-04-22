@@ -25,6 +25,8 @@ import navRoutes from "./routes/nav-routes";
 import groupRoutes from "./routes/group-routes";
 import groupMemberRoutes from "./routes/group-member-routes";
 import taskRoutes from "./routes/task-routes";
+import expenseRoutes from "./routes/expense-routes";
+import contributionRoutes from "./routes/contribution-routes";
 
 app.use("/auth", authRoutes);
 app.use("/api/user", userRoutes);
@@ -32,6 +34,8 @@ app.use("/", navRoutes);
 app.use("/api/group", groupRoutes);
 app.use("/api/group-member", groupMemberRoutes);
 app.use("/api/task", taskRoutes);
+app.use("/api/expense", expenseRoutes);
+app.use("/api/contribution", contributionRoutes);
 
 app.use((req, res) => {
     res.status(404).send("<h1>404 - Not Found</h1>");
