@@ -24,12 +24,14 @@ import userRoutes from "./routes/user-routes";
 import navRoutes from "./routes/nav-routes";
 import groupRoutes from "./routes/group-routes";
 import groupMemberRoutes from "./routes/group-member-routes";
+import taskRoutes from "./routes/task-routes";
 
 app.use("/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/", navRoutes);
 app.use("/api/group", groupRoutes);
 app.use("/api/group-member", groupMemberRoutes);
+app.use("/api/task", taskRoutes);
 
 app.use((req, res) => {
     res.status(404).send("<h1>404 - Not Found</h1>");
