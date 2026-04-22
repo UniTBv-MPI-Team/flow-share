@@ -10,7 +10,8 @@ module.exports = {
     rootDir: './',
 
     roots: [
-        "<rootDir>/src"
+        "<rootDir>/src",
+        "<rootDir>/tests"
     ],
 
     testPathIgnorePatterns: [
@@ -37,7 +38,14 @@ module.exports = {
 
     coverageDirectory: "coverage",
 
-    coverageThreshold:{},
+    coverageThreshold:{
+        global: {
+            branches: 50,
+            functions: 50,
+            lines: 50,
+            statements: 50,
+        },
+    },
 
     moduleNameMapper:{
 
