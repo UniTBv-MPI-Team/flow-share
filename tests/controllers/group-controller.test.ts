@@ -17,6 +17,7 @@ jest.mock('../../src/services/group-service', () => ({
 
 jest.mock('../../src/services/group-member-service', () => ({
     addMember: jest.fn(),
+    getMemberByUserAndGroup: jest.fn(),
 }));
 
 const mockGroupService = GroupService as jest.Mocked<typeof GroupService>;
@@ -329,6 +330,7 @@ describe('Group Controller', () => {
             const req = createAuthenticatedRequest(AUTHENTICATED_USER_ID, 'DELETE', reqParams);
             const res = mockResponse();
 
+            mockGroupMemberService.getMemberByUserAndGroup.mockResolvedValue({ isAdmin: true } as any);
             mockGroupService.deleteGroup.mockResolvedValue(false);
 
             await GroupController.handleDelete(req, res);
@@ -344,6 +346,7 @@ describe('Group Controller', () => {
             const req = createAuthenticatedRequest(AUTHENTICATED_USER_ID, 'DELETE', reqParams);
             const res = mockResponse();
 
+            mockGroupMemberService.getMemberByUserAndGroup.mockResolvedValue({ isAdmin: true } as any);
             mockGroupService.deleteGroup.mockResolvedValue(true);
 
             await GroupController.handleDelete(req, res);
