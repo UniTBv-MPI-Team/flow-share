@@ -14,7 +14,16 @@ export const getGroupMembers = async (
             groupId: groupId,
         },
         include: {
-            user: true,
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    emailAddress: true,
+                    isVerified: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            }
         },
     });
 
