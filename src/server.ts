@@ -3,6 +3,10 @@ import expressLayouts from "express-ejs-layouts";
 import path from "path";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import logger from "./utils/logger";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -37,17 +41,31 @@ app.use("/api/task", taskRoutes);
 app.use("/api/expense", expenseRoutes);
 app.use("/api/contribution", contributionRoutes);
 
-app.use((req, res) => {
+app.get("/api/health", async (_req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.status(200).json({
+            status: "ok",
+            uptime: Math.floor(process.uptime()),
+            timestamp: new Date().toISOString(),
+            db: "connected"
+        });
+    } catch {
+        res.status(503).json({ status: "error", db: "disconnected" });
+    }
+});
+
+app.use((_req, res) => {
     res.status(404).send("<h1>404 - Not Found</h1>");
 });
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error("Server error:", err);
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    logger.error("Unhandled server error", { message: err.message, stack: err.stack });
     res.status(500).send("<h1>500 - Server Error</h1>");
 });
 
 app.listen(PORT, () => {
-    console.log(`FlowShare running on port ${PORT} [${NODE_ENV}]`);
+    logger.info(`FlowShare running on port ${PORT}`, { env: NODE_ENV, port: PORT });
 });
 
 process.on("SIGTERM", () => process.exit(0));
