@@ -178,6 +178,11 @@ export const handleDelete = async (req: AuthenticateRequest, res: Response) => {
     }
 
     try {
+        const membership = await GroupMemberService.getMemberByUserAndGroup(authenticatedUserId, groupId);
+        if (!membership || !membership.isAdmin) {
+            return res.status(403).json({ message: "Only group admins can delete the group." });
+        }
+
         const groupToDelete = { id: groupId } as Group;
         const deleted = await GroupService.deleteGroup(groupToDelete);
 
