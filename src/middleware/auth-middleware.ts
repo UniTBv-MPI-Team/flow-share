@@ -16,27 +16,35 @@ export const authenticate = async (
 ): Promise<void> => {
     const token = req.cookies.token;
 
+    const isApiRoute = req.path.startsWith("/api/");
+
+    const unauthorized = (message: string) => {
+        if (isApiRoute) {
+            res.status(401).json({ message });
+        } else {
+            res.redirect("/login");
+        }
+    };
+
     if (!token) {
-        res.redirect("/login");
+        unauthorized("Authentication required.");
         return;
     }
 
     try {
         const decoded = verifyToken(token);
-        
+
         if (!decoded) {
-            console.warn("Invalid token detected");
             res.clearCookie('token');
-            res.redirect("/login");
+            unauthorized("Invalid or expired token.");
             return;
         }
 
         const user = await findUserById(decoded.id);
-        
+
         if (!user) {
-            console.warn(`User not found for ID: ${decoded.id}`);
             res.clearCookie('token');
-            res.redirect("/login");
+            unauthorized("User not found.");
             return;
         }
 
@@ -45,7 +53,7 @@ export const authenticate = async (
     } catch (err) {
         console.error("Authentication error:", err);
         res.clearCookie("token");
-        res.redirect("/login");
+        unauthorized("Authentication error.");
         return;
     }
 };

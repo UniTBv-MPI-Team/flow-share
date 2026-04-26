@@ -12,14 +12,15 @@ describe('Auth Integration', () => {
         const res = await request(app)
             .post('/auth/register')
             .send(validUser);
-        expect(res.status).toBe(201);
+        expect(res.status).toBe(302);
+        expect(res.headers['set-cookie']).toBeDefined();
     });
 
     it('rejects duplicate username', async () => {
         const res = await request(app)
             .post('/auth/register')
             .send(validUser);
-        expect(res.status).toBe(409);
+        expect(res.status).toBe(400);
     });
 
     it('rejects missing fields on register', async () => {
@@ -32,14 +33,15 @@ describe('Auth Integration', () => {
     it('logs in with valid credentials', async () => {
         const res = await request(app)
             .post('/auth/login')
-            .send({ username: validUser.username, password: validUser.password });
-        expect(res.status).toBe(200);
+            .send({ credentials: validUser.username, password: validUser.password });
+        expect(res.status).toBe(302);
+        expect(res.headers['set-cookie']).toBeDefined();
     });
 
     it('rejects wrong password', async () => {
         const res = await request(app)
             .post('/auth/login')
-            .send({ username: validUser.username, password: 'wrongpass' });
+            .send({ credentials: validUser.username, password: 'wrongpass' });
         expect(res.status).toBe(401);
     });
 

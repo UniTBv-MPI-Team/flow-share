@@ -21,8 +21,9 @@ describe('Groups Integration', () => {
         await request(app).post('/auth/register').send(adminUser);
         const loginRes = await request(app)
             .post('/auth/login')
-            .send({ username: adminUser.username, password: adminUser.password });
-        authCookie = loginRes.headers['set-cookie']?.[0];
+            .send({ credentials: adminUser.username, password: adminUser.password });
+        const cookieHeader = loginRes.headers['set-cookie'];
+        authCookie = Array.isArray(cookieHeader) ? cookieHeader[0] : cookieHeader;
 
         await request(app).post('/auth/register').send(regularUser);
     });
@@ -33,7 +34,7 @@ describe('Groups Integration', () => {
             .set('Cookie', authCookie)
             .send({ name: 'Test Group', description: 'Integration test group' });
         expect(res.status).toBe(201);
-        groupId = res.body.id;
+        groupId = res.body.group.id;
     });
 
     it('creator is automatically admin', async () => {
@@ -69,8 +70,9 @@ describe('Groups Integration', () => {
     it('non-admin cannot delete group', async () => {
         const loginRes = await request(app)
             .post('/auth/login')
-            .send({ username: regularUser.username, password: regularUser.password });
-        const memberCookie = loginRes.headers['set-cookie']?.[0];
+            .send({ credentials: regularUser.username, password: regularUser.password });
+        const cookieHeader = loginRes.headers['set-cookie'];
+        const memberCookie = Array.isArray(cookieHeader) ? cookieHeader[0] : cookieHeader;
 
         const res = await request(app)
             .delete(`/api/group/${groupId}`)
