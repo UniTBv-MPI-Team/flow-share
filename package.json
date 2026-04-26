@@ -22,6 +22,9 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.8.1",
     "@types/supertest": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
+    "eslint": "^10.2.1",
     "jest": "^30.2.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.17.1",
@@ -39,6 +42,8 @@
     "prisma:migrate": "prisma migrate dev",
     "test": "jest --detectOpenHandles --forceExit --passWithNoTests",
     "test:watch": "jest --watchAll --detectOpenHandles --forceExit",
-    "test:coverage": "jest --coverage --detectOpenHandles --forceExit"
+    "test:coverage": "jest --coverage --detectOpenHandles --forceExit",
+    "lint": "eslint src/**/*.ts",
+    "test:unit": "jest --detectOpenHandles --forceExit --passWithNoTests --testPathIgnorePatterns=tests/integration"
   }
 }
