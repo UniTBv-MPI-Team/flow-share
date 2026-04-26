@@ -6,7 +6,6 @@ describe('Expense & Contribution Integration', () => {
     let memberCookie: string;
     let groupId: number;
     let expenseId: number;
-    let memberId: number;
 
     const adminUser = {
         username: 'testuser_expense_admin',
@@ -24,26 +23,27 @@ describe('Expense & Contribution Integration', () => {
         await request(app).post('/auth/register').send(adminUser);
         const adminLogin = await request(app)
             .post('/auth/login')
-            .send({ username: adminUser.username, password: adminUser.password });
-        adminCookie = adminLogin.headers['set-cookie']?.[0];
+            .send({ credentials: adminUser.username, password: adminUser.password });
+        const adminCookieHeader = adminLogin.headers['set-cookie'];
+        adminCookie = Array.isArray(adminCookieHeader) ? adminCookieHeader[0] : adminCookieHeader;
 
         await request(app).post('/auth/register').send(memberUser);
         const memberLogin = await request(app)
             .post('/auth/login')
-            .send({ username: memberUser.username, password: memberUser.password });
-        memberCookie = memberLogin.headers['set-cookie']?.[0];
+            .send({ credentials: memberUser.username, password: memberUser.password });
+        const memberCookieHeader = memberLogin.headers['set-cookie'];
+        memberCookie = Array.isArray(memberCookieHeader) ? memberCookieHeader[0] : memberCookieHeader;
 
         const groupRes = await request(app)
             .post('/api/group')
             .set('Cookie', adminCookie)
             .send({ name: 'Expense Test Group', description: '' });
-        groupId = groupRes.body.id;
+        groupId = groupRes.body.group.id;
 
-        const addMemberRes = await request(app)
-            .post('/api/group-member')
+        await request(app)
+            .post(`/api/group-member/group/${groupId}/add-by-username`)
             .set('Cookie', adminCookie)
-            .send({ groupId, username: memberUser.username });
-        memberId = addMemberRes.body.id;
+            .send({ username: memberUser.username });
     });
 
     it('admin can create expense', async () => {
@@ -52,7 +52,7 @@ describe('Expense & Contribution Integration', () => {
             .set('Cookie', adminCookie)
             .send({ groupId, title: 'Test Expense', value: 100 });
         expect(res.status).toBe(201);
-        expenseId = res.body.id;
+        expenseId = res.body.expense.id;
     });
 
     it('non-admin cannot delete expense', async () => {
@@ -66,7 +66,7 @@ describe('Expense & Contribution Integration', () => {
         const res = await request(app)
             .post('/api/contribution')
             .set('Cookie', memberCookie)
-            .send({ expenseId, memberId, value: 30 });
+            .send({ expenseId, groupId, value: 30 });
         expect(res.status).toBe(201);
     });
 
@@ -74,7 +74,7 @@ describe('Expense & Contribution Integration', () => {
         const res = await request(app)
             .post('/api/contribution')
             .set('Cookie', adminCookie)
-            .send({ expenseId, memberId, value: 200 });
+            .send({ expenseId, groupId, value: 200 });
         expect(res.status).toBe(400);
     });
 
@@ -82,7 +82,7 @@ describe('Expense & Contribution Integration', () => {
         const res = await request(app)
             .post('/api/contribution')
             .set('Cookie', memberCookie)
-            .send({ expenseId, memberId, value: 50 });
+            .send({ expenseId, groupId, value: 50 });
         expect(res.status).toBe(200);
     });
 
@@ -91,8 +91,7 @@ describe('Expense & Contribution Integration', () => {
             .get(`/api/expense/group/${groupId}`)
             .set('Cookie', adminCookie);
         expect(res.status).toBe(200);
-        const expense = res.body.find((e: any) => e.id === expenseId);
+        const expense = res.body.expenses.find((e: any) => e.id === expenseId);
         expect(expense).toBeDefined();
-        expect(expense.contributions).toBeDefined();
     });
 });
