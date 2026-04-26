@@ -16,7 +16,7 @@ export const authenticate = async (
 ): Promise<void> => {
     const token = req.cookies.token;
 
-    const isApiRoute = req.path.startsWith("/api/");
+    const isApiRoute = req.originalUrl.startsWith("/api/");
 
     const unauthorized = (message: string) => {
         if (isApiRoute) {

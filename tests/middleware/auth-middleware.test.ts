@@ -24,8 +24,9 @@ const MOCK_SAFE_USER: Omit<User, 'passwordHash'> = {
     updatedAt: new Date(),
 } as any; 
 
-const mockRequest = (token?: string) => ({
+const mockRequest = (token?: string, originalUrl: string = '/home') => ({
     cookies: { token },
+    originalUrl,
 }) as unknown as AuthenticatedRequest;
 
 const mockResponse = () => {

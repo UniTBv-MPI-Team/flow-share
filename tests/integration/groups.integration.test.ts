@@ -39,7 +39,7 @@ describe('Groups Integration', () => {
 
     it('creator is automatically admin', async () => {
         const res = await request(app)
-            .get(`/api/group/${groupId}`)
+            .get(`/api/group-member/group/${groupId}`)
             .set('Cookie', authCookie);
         expect(res.status).toBe(200);
         const creator = res.body.members?.find((m: any) => m.user.username === adminUser.username);
@@ -53,17 +53,17 @@ describe('Groups Integration', () => {
 
     it('admin can add a member', async () => {
         const res = await request(app)
-            .post('/api/group-member')
+            .post(`/api/group-member/group/${groupId}/add-by-username`)
             .set('Cookie', authCookie)
-            .send({ groupId, username: regularUser.username });
+            .send({ username: regularUser.username });
         expect(res.status).toBe(201);
     });
 
     it('cannot add existing member again', async () => {
         const res = await request(app)
-            .post('/api/group-member')
+            .post(`/api/group-member/group/${groupId}/add-by-username`)
             .set('Cookie', authCookie)
-            .send({ groupId, username: regularUser.username });
+            .send({ username: regularUser.username });
         expect(res.status).toBe(409);
     });
 
