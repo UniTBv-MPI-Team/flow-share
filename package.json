@@ -44,6 +44,7 @@
     "test:watch": "jest --watchAll --detectOpenHandles --forceExit",
     "test:coverage": "jest --coverage --detectOpenHandles --forceExit",
     "lint": "eslint src/**/*.ts",
-    "test:unit": "jest --detectOpenHandles --forceExit --passWithNoTests --testPathIgnorePatterns=tests/integration"
+    "test:unit": "jest --detectOpenHandles --forceExit --passWithNoTests --testPathIgnorePatterns=tests/integration",
+    "test:integration": "jest --detectOpenHandles --forceExit --testPathPattern=tests/integration"
   }
 }
